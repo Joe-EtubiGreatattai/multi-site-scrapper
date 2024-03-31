@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accident Reports</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="animation.css">
+  <style>
+    #loading {
+      display: none;
+    }
+
+    #noReports {
+      display: none;
+      color: red;
+    }
+  </style>
+</head>
+
+<body class="container mx-auto p-4">
+  <div>
+    <h1 class="text-4xl mb-4">Accident Reports</h1>
+
+    <div class="mb-4">
+      <label for="searchBase" class="mr-2">Search Base:</label>
+      <select id="searchBase" name="searchBase" class="px-2 py-1 border">
+        <option value="vanguard">Vanguard News</option>
+        <option value="thecurrent">The current</option>
+        <option value="punch">Punch newspaper</option>
+        <option value="daily">Daily trust</option>
+        <option value="guyana">News Room Guyana</option>
+        <option value="ewn">Ewn Traffic</option>
+        <option value="sowetanlive">Sowetanlive</option>
+        <option value="alive">Arrive alive</option>
+        <option value="africanews">Africa new</option>
+        <!-- Add more options as needed -->
+      </select>
+    </div>
+
+    <!-- <div class="mb-4">
+      <label for="searchQuery" class="mr-2">Enter a search query:</label>
+      <input type="text"  name="searchQuery" class="px-2 py-1 border">
+</div> -->
+
+    <div class="mb-4">
+      <label for="searchQuery" class="mr-2">Select Accident Type:</label>
+      <select id="searchQuery" name="searchQuery" class="px-2 py-1 border">
+        <option value="Select Accident Type">Select Accident Type</option>
+        <option value="Building Collapse">Building Collapse</option>
+        <option value="Fallen Tanker">Fallen Tanker</option>
+        <option value="Fire">Fire</option>
+        <option value="Gas Explosion">Gas Explosion</option>
+        <option value="Kidnapping">Kidnapping</option>
+        <option value="Murder">Murder</option>
+        <option value="Public Protest">Public Protest</option>
+        <option value="Riot">Riot</option>
+        <option value="Robbery">Robbery</option>
+        <option value="Severe Traffic Congestion">Severe Traffic Congestion</option>
+        <option value="Vehicle Accident">Vehicle Accident</option>
+        <option value="Vehicle Breakdown">Vehicle Breakdown</option>
+        <option value="Violent Attacks">Violent Attacks</option>
+        <option value="WARNING">WARNING</option>
+        <option value="Warning- Flood">Warning- Flood</option>
+      </select>
+    </div>
+
+
+    <div class="mb-4">
+      <label for="startDate" class="mr-2">Start Date:</label>
+      <input type="date" id="startDate" name="startDate" class="px-2 py-1 border">
+    </div>
+
+    <div class="mb-4">
+      <label for="endDate" class="mr-2">End Date:</label>
+      <input type="date" id="endDate" name="endDate" class="px-2 py-1 border">
+    </div>
+    <button onclick="search()" class="search-button"><i class="bi bi-search"></i></button>
+
+    <div class="total-results">
+      Total result(s):<span class="number-of-results">0</span>
+    </div>
+
+    <div id="loading">
+      <!--animation here-->
+      <div class="text-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
+    <div id="noReports">
+      No reports found</div>
+  </div>
+
+  <ul id="reportsList" class="mt-1 list-none">
+    <!-- Placeholder for 'No current search' -->
+    <li id="noSearchMessage">
+      <main>
+        <div class="message">
+          <p class="message__line">Loading…</p>
+          <p class="message__line">Search for recent accident reports now!</p>
+          <p class="message__line">Find accident details by entering keywords</p>
+          <p class="message__line">Specify start and end dates for your search</p>
+          <p class="message__line">Explore reports within a date range</p>
+          <p class="message__line">Discover reports by accident type</p>
+          <p class="message__line">Securing the details of recent incidents...</p>
+          <p class="message__line">Customize your search for specific incidents</p>
+        </div>
+      </main>
+    </li>
+  </ul>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+  <script>
+    async function search() {
+      // Reset the result count to 0
+      document.querySelector('.number-of-results').textContent = '0';
+
+      const searchBase = document.getElementById('searchBase').value;
+      const searchQuery = document.getElementById('searchQuery').value;
+      const startDate = document.getElementById('startDate').value;
+      const endDate = document.getElementById('endDate').value;
+
+      // Display loading animation
+      const loadingElement = document.getElementById('loading');
+      const noReportsElement = document.getElementById('noReports');
+
+      if (loadingElement) {
+        loadingElement.style.display = 'block';
+      }
+
+      if (noReportsElement) {
+        noReportsElement.style.display = 'none';
+      }
+
+      try {
+        const response = await fetch(`/search?searchBase=${searchBase}&query=${searchQuery}&startDate=${startDate}&endDate=${endDate}`);
+        const reports = await response.json();
+
+        // Reinitialize element references after potential DOM changes
+        const reportsList = document.getElementById('reportsList');
+        const noSearchMessage = document.getElementById('noSearchMessage');
+        const numberOfResults = document.querySelector('.number-of-results');
+
+        if (reportsList) {
+          reportsList.innerHTML = '';
+
+          if (reports.length === 0) {
+            // Show 'No current search' message
+            if (noSearchMessage) {
+              noSearchMessage.style.display = 'block';
+            }
+            // Hide result count
+            if (numberOfResults) {
+              numberOfResults.textContent = '0';
+            }
+          } else {
+            // Hide 'No current search' message
+            if (noSearchMessage) {
+              noSearchMessage.style.display = 'none';
+            }
+            // Display result count
+            if (numberOfResults) {
+              numberOfResults.textContent = reports.length;
+            }
+
+            // Populate reports
+            for (const report of reports) {
+              const listItem = document.createElement('li');
+              let location = '';
+
+
+
+              listItem.innerHTML = `
+            <h2 class="text-xl font-bold">${report.accidentType}</h2>
+            <p class="text-sm">Time: ${report.date}</p>
+            <p class="text-sm">Details: ${report.details}</p>
+            <p class="text-sm">Location: ${report.location}</p> <!-- Add location to the reports -->
+            <button onclick="saveReport({ accidentType: '${report.accidentType}', location: '${report.location}', date: '${report.date}', details: '${report.details}' })" class="btn-icon bg-green-500 p-2 text-white" title="Save">
+  <i class="bi bi-floppy"></i>
+</button>
+            <button onclick="deleteReport()" class="btn-icon p-2 bg-red-500 text-white" title="Delete">
+              <i class="bi bi-trash"></i>
+            </button>
+            <hr class="my-2 border">
+          `;
+              if (reportsList) {
+                reportsList.appendChild(listItem);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        displayErrorMessage('An error occurred. Please try again.');
+      } finally {
+        // Hide loading animation
+        if (loadingElement) {
+          loadingElement.style.display = 'none';
+        }
+      }
+    }
+
+    // Function to display error messages with Bootstrap styling
+    function displayErrorMessage(message) {
+      const errorContainer = document.getElementById('errorContainer');
+      if (errorContainer) {
+        errorContainer.innerHTML = `
+      <div class="alert alert-danger" role="alert">
+        ${message}
+      </div>
+    `;
+      }
+    }
+
+    // Function to display error messages with Bootstrap styling
+    function displayErrorMessage(message) {
+      const errorContainer = document.getElementById('errorContainer');
+      errorContainer.innerHTML = `
+    <div class="alert alert-danger" role="alert">
+      ${message}
+    </div>
+  `;
+    }
+
+    function saveReport(report) {
+      // Send a POST request to the server to save the report
+      fetch("/save-report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          accidentType: report.accidentType,
+          location: report.location,
+          dateOfOccurance: report.date,
+          accidentDetails: report.details,
+        }),
+      })
+        .then((response) => {
+          if (response.ok) {
+            alert("Report saved successfully!");
+          } else {
+            throw new Error("Failed to save report");
+          }
+        })
+        .catch((error) => {
+          console.error("Error saving report:", error);
+          alert("Failed to save report. Please try again.");
+        });
+    }
+
+    function deleteReport() {
+      // Add delete logic here
+      alert('Report deleted!');
+    }
+  </script>
+
+</body>
+
+</html>
